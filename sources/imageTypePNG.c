@@ -111,7 +111,7 @@ static void end_chunk(struct pngout *s)
 }
 
 
-void SaveImagePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height)
+void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height)
 {
     struct pngout s;
 

@@ -34,7 +34,7 @@ typedef struct
 #pragma pack(pop)
 
 
-void SaveImageTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height)
+void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height)
 {
 	FILE *outputFile = fopen(filename, "w");
 	if (outputFile == NULL)

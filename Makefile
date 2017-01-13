@@ -1,6 +1,6 @@
 # Makefile
 
-LIBRARY := imaging.a
+LIBRARY := libImaging.a
 
 OBJ_DIR := obj
 
@@ -11,9 +11,11 @@ CC=clang
 CC_FLAGS = -Wall -O3
 
 
-all: $(OBJ_FILES)
-	ar rcs $(LIBRARY) $^
+all: $(LIBRARY)
 
+
+$(LIBRARY): $(OBJ_FILES)
+	ar rcs $@ $^
 
 $(OBJ_DIR)/%.o: sources/%.c
 	@echo Compile "$@"...

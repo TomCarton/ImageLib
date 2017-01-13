@@ -8,7 +8,7 @@
 #include "../include/imaging.h"
 
 
-unsigned char *Downsize(unsigned char *image, unsigned int width, unsigned int height)
+unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned int height)
 {
     unsigned int line = width * 3;
 

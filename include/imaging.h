@@ -8,12 +8,12 @@
 
 
 // resize
-unsigned char *Downsize(unsigned char *image, unsigned int width, unsigned int height);
+unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned int height);
 
 // image file formats
-void SaveImagePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height);
-void SaveImagePPM(char *filename, unsigned char *image, unsigned int width, unsigned int height);
-void SaveImageTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height);
+void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height);
+void ImageSavePPM(char *filename, unsigned char *image, unsigned int width, unsigned int height);
+void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height);
 
 
 #endif // __IMAGING_H__
