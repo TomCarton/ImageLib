@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#include "image.h"
+#include "../include/imaging.h"
 
 
 void SaveImagePPM(char *filename, unsigned char *image, unsigned int width, unsigned int height)

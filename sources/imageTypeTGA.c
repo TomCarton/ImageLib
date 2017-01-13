@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "image.h"
+#include "../include/imaging.h"
 
 
 #pragma pack(push)
