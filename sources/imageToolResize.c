@@ -5,7 +5,7 @@
 
 #include <stdlib.h>
 
-#include "../include/imaging.h"
+#include "../image.h"
 
 
 unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned int height)
