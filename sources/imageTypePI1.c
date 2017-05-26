@@ -7,93 +7,85 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/imaging.h"
+#include "../image.h"
 
 
-Error ImageReadPI1(char *filename, IMAGE **image)
+Error ImageLoadPI1(const char *filename, Image **imagePtr)
 {
-	IMAGE *image = NULL;
+    FILE *inputFile = fopen(filename, "r");
+    if (inputFile == NULL)
+        return kErrorFileOpen;
 
-	FILE *inputFile = fopen(filename, "r");
-	if (inputFile != NULL)
-	{
-		size_t readSize;
+    unsigned short header;
+    size_t read = fread(&header, 2, 1, inputFile);
+    if (read != 1)
+        return kErrorFileRead;
 
-		unsigned short header;
-		readSize = fread(&header, 2, 1, inputFile);
-		if (readSize == 2 && header == 0)
-		{
+    if (header != 0)
+        return kErrorImageFormat;
 
-		}
+    // palette
+    unsigned short paletteST[16];
+    read = fread(&paletteST, 2, 16, inputFile);
+    if (read != 16)
+        return kErrorFileRead;
 
-		fclose(inputFile);
-	}
+    unsigned char paletteRGB[16][3];
+    for (unsigned int i = 0; i < 16; ++i)
+    {
+        paletteST[i] = swap16(paletteST[i]);
+        unsigned short c = paletteST[i];
+        c = ((c & 0x777) << 1) | ((c & 0x888) >> 3);
 
-	return image;
+        paletteRGB[i][0] = ((c >> 8) & 15) * 255 / 15;
+        paletteRGB[i][1] = ((c >> 4) & 15) * 255 / 15;
+        paletteRGB[i][2] = (c & 15) * 255 / 15;
+    }
+
+    Image *image = malloc(sizeof(Image));
+    if (image == NULL)
+        return kErrorMemory;
+    image->width = 320;
+    image->height = 200;
+    image->data = malloc(320 * 200 * 3);
+    if (image->data == NULL)
+        return kErrorMemory;
+
+    unsigned short buffer[16000];
+    read = fread(&buffer, 2, 16000, inputFile);
+    if (read != 16000)
+        return kErrorFileRead;
+
+    unsigned short *src = (unsigned short *)&buffer;
+    unsigned char *data = image->data;
+    for (unsigned int k = 0; k < 320 * 200 / 16; ++k)
+    {
+        unsigned short plan0 = swap16(*src++);
+        unsigned short plan1 = swap16(*src++);
+        unsigned short plan2 = swap16(*src++);
+        unsigned short plan3 = swap16(*src++);
+
+        for (unsigned int p = 0; p < 16; ++p)
+        {
+            unsigned int c = (plan0 & 0x8000) >> 15;
+            c |= (plan1 & 0x8000) >> 14;
+            c |= (plan2 & 0x8000) >> 13;
+            c |= (plan3 & 0x8000) >> 12;
+
+            *data++ = paletteRGB[c][0];
+            *data++ = paletteRGB[c][1];
+            *data++ = paletteRGB[c][2];
+
+            plan0 <<= 1;
+            plan1 <<= 1;
+            plan2 <<= 1;
+            plan3 <<= 1;
+        }
+    }
+
+    fclose(inputFile);
+    
+    *imagePtr = image;
+    
+    return kErrorNone;
 }
-
-
-#if 0
-
-#pragma pack(push)
-#pragma pack(1)
-
-typedef struct
-{
-	char  idlength;
-	char  colourmaptype;
-	char  datatypecode;
-
-	short colourmaporigin;
-	short colourmaplength;
-	char  colourmapdepth;
-
-	short x_origin;
-	short y_origin;
-	short width;
-	short height;
-	char  bitsperpixel;
-	char  imagedescriptor;
-} TGA_HEADER;
-
-#pragma pack(pop)
-
-
-void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height)
-{
-	FILE *outputFile = fopen(filename, "w");
-	if (outputFile == NULL)
-		goto error;
-
-	TGA_HEADER header;
-	memset(&header, 0, sizeof(TGA_HEADER));
-
-	header.datatypecode = 2;
-	header.width = width;
-	header.height = height;
-	header.bitsperpixel = 24;
-	header.imagedescriptor = 0x20;
-	fwrite(&header, 1, sizeof(TGA_HEADER), outputFile);
-
-	unsigned char *data = malloc(width * height * 3);
-	if (data == NULL)
-		goto error;
-
-	for (unsigned int k = 0; k < width * height * 3; k += 3)
-	{
-		data[k + 0] = image[k + 2];
-		data[k + 1] = image[k + 1];
-		data[k + 2] = image[k + 0];
-	}
-	fwrite(data, 3, width * height, outputFile);
-	free(data);
-
-	fclose(outputFile);
-	return;
-
-error:
-	fprintf(stderr, "Failed to write image file '%s'\n", filename);
-	exit(-1);
-}
-
-#endif
