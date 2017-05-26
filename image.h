@@ -1,10 +1,19 @@
-// imaging.h
+// image.h
 //
 // written by Thomas CARTON
 //
 
-#ifndef __IMAGING_H__
-#define __IMAGING_H__
+#ifndef __IMAGE_H__
+#define __IMAGE_H__
+
+
+typedef struct
+{
+    unsigned int width;
+    unsigned int height;
+
+    unsigned char *data;
+} Image;
 
 
 // resize
@@ -16,4 +25,4 @@ void ImageSavePPM(char *filename, unsigned char *image, unsigned int width, unsi
 void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height);
 
 
-#endif // __IMAGING_H__
+#endif // __IMAGE_H__

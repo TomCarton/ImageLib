@@ -1,4 +1,4 @@
-// imageTypeTGA.c
+// imageTypePI1.c
 //
 // written by Thomas CARTON
 //
@@ -7,8 +7,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../image.h"
+#include "../include/imaging.h"
 
+
+Error ImageReadPI1(char *filename, IMAGE **image)
+{
+	IMAGE *image = NULL;
+
+	FILE *inputFile = fopen(filename, "r");
+	if (inputFile != NULL)
+	{
+		size_t readSize;
+
+		unsigned short header;
+		readSize = fread(&header, 2, 1, inputFile);
+		if (readSize == 2 && header == 0)
+		{
+
+		}
+
+		fclose(inputFile);
+	}
+
+	return image;
+}
+
+
+#if 0
 
 #pragma pack(push)
 #pragma pack(1)
@@ -70,3 +95,5 @@ error:
 	fprintf(stderr, "Failed to write image file '%s'\n", filename);
 	exit(-1);
 }
+
+#endif

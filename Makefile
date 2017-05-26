@@ -1,6 +1,6 @@
 # Makefile
 
-LIBRARY := libImaging.a
+LIBRARY := libImage.a
 
 OBJ_DIR := obj
 

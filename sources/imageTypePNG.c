@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../include/imaging.h"
+#include "../image.h"
 
 
 static const unsigned int kBufferSize = 64;
