@@ -22,7 +22,7 @@ typedef struct
 unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned int height);
 
 // image file formats
-Error ImageLoadPI1(const char *filename, Image **image);
+Error ImageLoadDegas(const char *filename, Image **image);
 
 Error ImageSaveTGA(const char *filename, Image *image);
 
