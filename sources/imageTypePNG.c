@@ -17,15 +17,15 @@ struct pngout
 {
     FILE *outputFile;
 
-    uint8_t output[kBufferSize];   /* output buffer */
-    size_t nout;          /* number of bytes to output */
+    uint8_t output[kBufferSize];    // output buffer
+    size_t nout;                    // number of bytes to output
 
-    uint32_t crc32;       /* running CRC32 */
-    uint16_t s1, s2;      /* Adler CRC sums */
+    uint32_t crc32;                 // running CRC32
+    uint16_t s1, s2;                // Adler CRC sums
 };
 
 
-/* CRC32 computation */
+// CRC32 computation
 static const uint32_t crc_table[16] =
 {
     0x00000000, 0x1db71064, 0x3b6e20c8, 0x26d930ac,
@@ -111,15 +111,18 @@ static void end_chunk(struct pngout *s)
 }
 
 
-void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height)
+Error ImageSavePNG(const char *filename, Image *image)
 {
+    if (image->data == NULL)
+        return kErrorParameter;
+
     struct pngout s;
 
     s.outputFile = fopen(filename, "w");
     if (s.outputFile == NULL)
-        goto error;
+        return kErrorFileOpen;
 
-    unsigned int bpl = 1 + 3 * width;
+    unsigned int bpl = 1 + 3 * image->width;
     s.nout = 0;
 
     static unsigned char head[] = "\x89PNG\x0d\x0a\x1a\x0a";
@@ -127,14 +130,14 @@ void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsi
 
     // IHDR
     start_chunk(&s, "IHDR", 13);
-    be32(&s, width);
-    be32(&s, height);
+    be32(&s, image->width);
+    be32(&s, image->height);
     static uint8_t rgb[5] = {8, 2, 0, 0, 0};
     b8s(&s, rgb, sizeof(rgb));
     end_chunk(&s);
 
     // IDAT
-    start_chunk(&s, "IDAT", 2 + height * (5 + bpl) + 4);
+    start_chunk(&s, "IDAT", 2 + image->height * (5 + bpl) + 4);
     b8(&s, 0x78);
     b8(&s, 0x01);
 
@@ -144,19 +147,19 @@ void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsi
     fwrite(s.output, s.nout, 1, s.outputFile);
     s.nout = 0;
 
-    for (unsigned int y = 0; y < height; ++y)
+    for (unsigned int y = 0; y < image->height; ++y)
     {
-        b8(&s, (y + 1) == height);
+        b8(&s, (y + 1) == image->height);
         le16(&s, bpl);
         le16(&s, ~bpl);
         adler8(&s, 0);
 
-        for (unsigned int x = 0; x < width; ++x)
+        for (unsigned int x = 0; x < image->width; ++x)
         {
-            unsigned int k = (y * width + x) * 3;
-            adler8(&s, image[k + 0]);
-            adler8(&s, image[k + 1]);
-            adler8(&s, image[k + 2]);
+            unsigned int k = (y * image->width + x) * 3;
+            adler8(&s, image->data[k + 0]);
+            adler8(&s, image->data[k + 1]);
+            adler8(&s, image->data[k + 2]);
         }
     }
 
@@ -171,9 +174,6 @@ void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsi
     s.nout = 0;
 
     fclose(s.outputFile);
-    return;
-
-error:
-    fprintf(stderr, "Failed to write image file '%s'\n", filename);
-    exit(-1);
+    
+    return kErrorNone;
 }

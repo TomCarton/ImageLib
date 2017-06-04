@@ -25,9 +25,9 @@ unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned 
 Error ImageLoadDegas(const char *filename, Image **image);
 
 Error ImageSaveTGA(const char *filename, Image *image);
+Error ImageSavePNG(const char *filename, Image *image);
 
-
-void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height);
+//void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height);
 void ImageSavePPM(char *filename, unsigned char *image, unsigned int width, unsigned int height);
 //void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height);
 
