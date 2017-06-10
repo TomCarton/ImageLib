@@ -111,9 +111,9 @@ static void end_chunk(struct pngout *s)
 }
 
 
-Error ImageSavePNG(const char *filename, Image *image)
+Error ImageSavePNG(const Image image, const char *filename)
 {
-    if (image->data == NULL)
+    if (image.data == NULL)
         return kErrorParameter;
 
     struct pngout s;
@@ -122,7 +122,7 @@ Error ImageSavePNG(const char *filename, Image *image)
     if (s.outputFile == NULL)
         return kErrorFileOpen;
 
-    unsigned int bpl = 1 + 3 * image->width;
+    unsigned int bpl = 1 + 3 * image.width;
     s.nout = 0;
 
     static unsigned char head[] = "\x89PNG\x0d\x0a\x1a\x0a";
@@ -130,14 +130,14 @@ Error ImageSavePNG(const char *filename, Image *image)
 
     // IHDR
     start_chunk(&s, "IHDR", 13);
-    be32(&s, image->width);
-    be32(&s, image->height);
+    be32(&s, image.width);
+    be32(&s, image.height);
     static uint8_t rgb[5] = {8, 2, 0, 0, 0};
     b8s(&s, rgb, sizeof(rgb));
     end_chunk(&s);
 
     // IDAT
-    start_chunk(&s, "IDAT", 2 + image->height * (5 + bpl) + 4);
+    start_chunk(&s, "IDAT", 2 + image.height * (5 + bpl) + 4);
     b8(&s, 0x78);
     b8(&s, 0x01);
 
@@ -147,19 +147,19 @@ Error ImageSavePNG(const char *filename, Image *image)
     fwrite(s.output, s.nout, 1, s.outputFile);
     s.nout = 0;
 
-    for (unsigned int y = 0; y < image->height; ++y)
+    for (unsigned int y = 0; y < image.height; ++y)
     {
-        b8(&s, (y + 1) == image->height);
+        b8(&s, (y + 1) == image.height);
         le16(&s, bpl);
         le16(&s, ~bpl);
         adler8(&s, 0);
 
-        for (unsigned int x = 0; x < image->width; ++x)
+        for (unsigned int x = 0; x < image.width; ++x)
         {
-            unsigned int k = (y * image->width + x) * 3;
-            adler8(&s, image->data[k + 0]);
-            adler8(&s, image->data[k + 1]);
-            adler8(&s, image->data[k + 2]);
+            unsigned int k = (y * image.width + x) * 3;
+            adler8(&s, image.data[k + 0]);
+            adler8(&s, image.data[k + 1]);
+            adler8(&s, image.data[k + 2]);
         }
     }
 

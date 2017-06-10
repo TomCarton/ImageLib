@@ -22,13 +22,10 @@ typedef struct
 unsigned char *ImageDownsize(unsigned char *image, unsigned int width, unsigned int height);
 
 // image file formats
-Error ImageLoadDegas(const char *filename, Image **image);
+Error ImageLoadDegas(const char *filename, Image *image);
 
-Error ImageSaveTGA(const char *filename, Image *image);
-Error ImageSavePNG(const char *filename, Image *image);
-
-//void ImageSavePNG(char *filename, unsigned char *image, unsigned int width, unsigned int height);
-void ImageSavePPM(char *filename, unsigned char *image, unsigned int width, unsigned int height);
-//void ImageSaveTGA(char *filename, unsigned char *image, unsigned int width, unsigned int height);
+Error ImageSaveTarga(const Image image, const char *filename);
+Error ImageSavePNG(const Image image, const char *filename);
+Error ImageSavePPM(const Image image, const char *filename);
 
 #endif // __IMAGE_H__

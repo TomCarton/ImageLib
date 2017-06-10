@@ -59,8 +59,11 @@ static void Interleave(unsigned short *src, unsigned short *dst)
     }
 }
 
-Error ImageLoadDegas(const char *filename, Image **imagePtr)
+Error ImageLoadDegas(const char *filename, Image *image)
 {
+    if (image == NULL)
+        return kErrorParameter;
+
     FILE *inputFile = fopen(filename, "r");
     if (inputFile == NULL)
         return kErrorFileOpen;
@@ -104,9 +107,6 @@ Error ImageLoadDegas(const char *filename, Image **imagePtr)
         paletteRGB[i][2] = (c & r) * 255 / r;
     }
 
-    Image *image = malloc(sizeof(Image));
-    if (image == NULL)
-        return kErrorMemory;
     image->width = 320;
     image->height = 200;
     image->data = malloc(320 * 200 * 3);
@@ -158,8 +158,6 @@ Error ImageLoadDegas(const char *filename, Image **imagePtr)
     }
 
     fclose(inputFile);
-    
-    *imagePtr = image;
-    
+        
     return kErrorNone;
 }
